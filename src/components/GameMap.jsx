@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { durontoExpressRoute, questTypes } from '../data/routes';
+import { durontoExpressRoute } from '../data/routes';
 import StationNode from './StationNode';
 import QuestModal from './QuestModal';
+import { getCurrentLocation, checkStationUnlock, formatDistance } from '../utils/locationService';
+import { 
+  saveProgressOffline, 
+  loadProgressOffline, 
+  getOfflineLocation, 
+  queueOfflineAction,
+  initializeOfflineMode,
+  isOnline 
+} from '../utils/offlineService';
+import OfflineIndicator from './OfflineIndicator';
 
 const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigate }) => {
   const [selectedStation, setSelectedStation] = useState(null);
   const [currentLevel, setCurrentLevel] = useState(1);
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
+  const [locationStatus, setLocationStatus] = useState('checking'); // checking, granted, denied, error
+  const [nearestStation, setNearestStation] = useState(null);
+  const [locationMessage, setLocationMessage] = useState('📍 Checking your location...');
   
   // Ensure userProgress has default values
   const safeUserProgress = {
@@ -54,6 +69,8 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
   };
 
   const completeQuest = (stationId, reward) => {
+    console.log(`🎯 Completing quest for station ${stationId}`);
+    
     // Mark current station as completed
     const newProgress = {
       ...safeUserProgress,
@@ -65,31 +82,184 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
     
     onProgressUpdate(newProgress);
     
-    // Unlock next station
+    // Mark current station as completed in route data
+    const currentStation = durontoExpressRoute.stations.find(s => s.id === stationId);
+    if (currentStation) {
+      currentStation.isCompleted = true;
+      console.log(`✅ Marked station ${currentStation.name} as completed`);
+    }
+    
+    // Unlock next station in sequence (quest-based unlocking)
     const nextStation = durontoExpressRoute.stations.find(s => s.id === stationId + 1);
     if (nextStation) {
       nextStation.isUnlocked = true;
+      console.log(`🔓 Unlocked next station: ${nextStation.name}`);
     }
     
     setSelectedStation(null);
   };
 
-  // Initialize first station as unlocked and current
+  // Initialize offline mode and load saved data
   useEffect(() => {
+    // Initialize offline capabilities
+    initializeOfflineMode();
+    
+    // Load saved progress from offline storage
+    const savedProgress = loadProgressOffline();
+    if (savedProgress && onProgressUpdate) {
+      console.log('Loading saved progress from offline storage');
+      onProgressUpdate(savedProgress);
+    }
+    
+    // Reset all stations to initial state (only first station unlocked)
     if (durontoExpressRoute.stations.length > 0) {
-      durontoExpressRoute.stations[0].isUnlocked = true;
-      // Make sure currentStation matches the first unlocked station
-      if (safeUserProgress.currentStation === 1 && safeUserProgress.completedStations.length === 0) {
-        // First station should be current if no stations are completed
+      durontoExpressRoute.stations.forEach((station, index) => {
+        station.isUnlocked = index === 0; // Only first station unlocked
+        station.isCompleted = false; // No stations completed initially
+      });
+      console.log('🔄 Reset station states - only first station unlocked');
+    }
+    
+    // Get user's location using offline-capable method
+    setLocationStatus('checking');
+    setLocationMessage('📍 Getting your location...');
+    
+    getOfflineLocation()
+      .then((location) => {
+        setUserLocation(location);
+        setLocationStatus('granted');
+        
+        // Show location source in message
+        let sourceMessage = '';
+        switch (location.source) {
+          case 'gps':
+            sourceMessage = '📍 GPS location acquired';
+            break;
+          case 'cached':
+            sourceMessage = '📍 Using cached location (offline mode)';
+            break;
+          case 'ip':
+            sourceMessage = '📍 Using network-based location';
+            break;
+          case 'route_estimate':
+            sourceMessage = `📍 Estimated location: ${location.note}`;
+            break;
+          case 'default':
+            sourceMessage = `📍 ${location.note}`;
+            break;
+          default:
+            sourceMessage = '📍 Location acquired';
+        }
+        
+        setLocationMessage(sourceMessage);
+        checkUserLocation(location.lat, location.lng);
+      })
+      .catch((error) => {
+        setLocationError(error.message);
+        setLocationStatus('error');
+        setLocationMessage('📍 All location methods failed. Use manual buttons!');
+        console.warn('All location methods failed:', error);
+      });
+  }, []);
+
+  // Check user location against stations and handle journey progress
+  const checkUserLocation = (lat, lng) => {
+    const locationInfo = checkStationUnlock(lat, lng, safeUserProgress.completedStations);
+    setNearestStation(locationInfo.nearestStation);
+    setLocationMessage(locationInfo.locationMessage);
+    
+    const { journeyProgress } = locationInfo;
+    
+    // Auto-complete stations that user has passed
+    if (journeyProgress.stationsToComplete.length > 0) {
+      const newCompletedStations = [...safeUserProgress.completedStations];
+      const newCollectedCards = [...safeUserProgress.collectedCards];
+      let newXP = safeUserProgress.totalXP;
+      let newTokens = safeUserProgress.tokens;
+      
+      journeyProgress.stationsToComplete.forEach(stationId => {
+        if (!newCompletedStations.includes(stationId)) {
+          newCompletedStations.push(stationId);
+          const station = durontoExpressRoute.stations.find(s => s.id === stationId);
+          if (station) {
+            newCollectedCards.push(station.cardReward);
+            newXP += 100;
+            newTokens += 10;
+            
+            // Mark station as completed in the route data
+            station.isCompleted = true;
+          }
+        }
+      });
+      
+      // Update progress
+      const updatedProgress = {
+        ...safeUserProgress,
+        completedStations: newCompletedStations,
+        collectedCards: newCollectedCards,
+        totalXP: newXP,
+        tokens: newTokens
+      };
+      
+      onProgressUpdate(updatedProgress);
+      
+      // Save progress offline
+      saveProgressOffline(updatedProgress);
+      
+      // Queue action for sync when online
+      if (!isOnline()) {
+        queueOfflineAction({
+          type: 'progress_update',
+          data: updatedProgress
+        });
       }
     }
-  }, [safeUserProgress]);
+    
+    // Auto-unlock current active station ONLY if user is physically near it AND previous station is completed
+    if (journeyProgress.canUnlockCurrent && journeyProgress.currentActiveStation) {
+      const stationToUnlock = durontoExpressRoute.stations.find(s => s.id === journeyProgress.currentActiveStation.id);
+      const previousStationCompleted = stationToUnlock.id === 1 || safeUserProgress.completedStations.includes(stationToUnlock.id - 1);
+      
+      if (stationToUnlock && !stationToUnlock.isUnlocked && previousStationCompleted) {
+        // Only unlock if user is actually near the station (not just based on journey progression)
+        const isNearStation = nearestStation && nearestStation.id === stationToUnlock.id && 
+                             nearestStation.distanceFromUser <= nearestStation.proximityRadius;
+        
+        if (isNearStation) {
+          stationToUnlock.isUnlocked = true;
+          setLocationMessage(`🎉 ${stationToUnlock.name} unlocked! Ready for your quest!`);
+        }
+      }
+    }
+  };
+
+  // Refresh location periodically (every 30 seconds)
+  useEffect(() => {
+    if (locationStatus === 'granted' && userLocation) {
+      const interval = setInterval(() => {
+        getCurrentLocation()
+          .then((location) => {
+            setUserLocation(location);
+            checkUserLocation(location.lat, location.lng);
+          })
+          .catch((error) => {
+            console.warn('Location update failed:', error);
+          });
+      }, 30000); // 30 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [locationStatus, userLocation, safeUserProgress.completedStations]);
 
   return (
-    <div className="relative w-full h-screen bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 overflow-hidden flex flex-col">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0">
-        {/* Floating Clouds */}
+    <>
+      {/* Offline Status Indicator */}
+      <OfflineIndicator />
+      
+      <div className="relative w-full h-screen bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 overflow-hidden flex flex-col">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          {/* Floating Clouds */}
         <motion.div
           className="absolute top-20 left-10 w-32 h-20 bg-white bg-opacity-20 rounded-full blur-sm"
           animate={{ x: [0, 50, 0], y: [0, -20, 0] }}
@@ -157,6 +327,15 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
               <p className="text-sm font-medium text-yellow-100 drop-shadow">
                 {durontoExpressRoute.trainName}
               </p>
+              {/* Location Status */}
+              <div className="text-xs text-yellow-200 drop-shadow mt-1 max-w-xs">
+                {locationMessage}
+                {locationStatus === 'error' && (
+                  <div className="text-xs text-yellow-100 mt-1 font-semibold animate-pulse">
+                    👆 Use manual location buttons above!
+                  </div>
+                )}
+              </div>
             </div>
           </motion.div>
           
@@ -201,6 +380,106 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
               </div>
               <div className="text-xs text-yellow-200 font-semibold">🏁 Stations</div>
             </div>
+            
+            {/* Location Refresh Button */}
+            <motion.button
+              onClick={() => {
+                setLocationStatus('checking');
+                setLocationMessage('📍 Refreshing location...');
+                getOfflineLocation()
+                  .then((location) => {
+                    setUserLocation(location);
+                    setLocationStatus('granted');
+                    checkUserLocation(location.lat, location.lng);
+                  })
+                  .catch((error) => {
+                    setLocationError(error.message);
+                    setLocationStatus('error');
+                    
+                    // Provide helpful error message with manual option
+                    let userFriendlyMessage = '';
+                    if (error.message.includes('denied')) {
+                      userFriendlyMessage = '📍 Location denied. Use manual buttons below!';
+                    } else if (error.message.includes('unavailable')) {
+                      userFriendlyMessage = '📍 GPS unavailable. Use manual location buttons!';
+                    } else {
+                      userFriendlyMessage = '📍 Location failed. Use manual buttons!';
+                    }
+                    
+                    setLocationMessage(userFriendlyMessage);
+                  });
+              }}
+              className="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-2 text-center border border-white/30 hover:bg-white/30 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <div className="text-2xl">
+                {locationStatus === 'checking' ? '🔄' : '📍'}
+              </div>
+              <div className="text-xs text-yellow-200 font-semibold">Location</div>
+            </motion.button>
+            
+            {/* Manual Location Override - Always show when location fails */}
+            {(locationStatus === 'error' || process.env.NODE_ENV === 'development') && (
+              <motion.button
+                onClick={() => {
+                  // Set location to Nagpur (since you're actually there)
+                  const nagpurCoords = { lat: 21.1458, lng: 79.0882 };
+                  setUserLocation(nagpurCoords);
+                  setLocationStatus('manual');
+                  setLocationMessage('🎯 Manual location: At Nagpur Junction (Your actual location)');
+                  checkUserLocation(nagpurCoords.lat, nagpurCoords.lng);
+                }}
+                className="bg-green-500/20 backdrop-blur-sm rounded-2xl px-4 py-2 text-center border border-green-300/30 hover:bg-green-500/30 transition-all"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                  title="Set location to Nagpur (you're currently here)"
+              >
+                <div className="text-2xl">🎯</div>
+                <div className="text-xs text-yellow-200 font-semibold">Manual</div>
+              </motion.button>
+            )}
+            
+            {/* Additional location options */}
+            {(locationStatus === 'error' || locationStatus === 'manual') && (
+              <>
+                <motion.button
+                  onClick={() => {
+                    // Simulate being at Hyderabad
+                    const hyderabadCoords = { lat: 17.3850, lng: 78.4867 };
+                    setUserLocation(hyderabadCoords);
+                    setLocationStatus('manual');
+                    setLocationMessage('🚂 Manual location: Near Hyderabad Deccan');
+                    checkUserLocation(hyderabadCoords.lat, hyderabadCoords.lng);
+                  }}
+                  className="bg-blue-500/20 backdrop-blur-sm rounded-2xl px-4 py-2 text-center border border-blue-300/30 hover:bg-blue-500/30 transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  title="Set location to Hyderabad"
+                >
+                  <div className="text-2xl">🏛️</div>
+                  <div className="text-xs text-yellow-200 font-semibold">HYD</div>
+                </motion.button>
+                
+                <motion.button
+                  onClick={() => {
+                    // Simulate being at Bengaluru
+                    const bengaluruCoords = { lat: 13.0287, lng: 77.5641 };
+                    setUserLocation(bengaluruCoords);
+                    setLocationStatus('manual');
+                    setLocationMessage('🚂 Manual location: At Bengaluru Yeshwantpur');
+                    checkUserLocation(bengaluruCoords.lat, bengaluruCoords.lng);
+                  }}
+                  className="bg-purple-500/20 backdrop-blur-sm rounded-2xl px-4 py-2 text-center border border-purple-300/30 hover:bg-purple-500/30 transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  title="Set location to Bengaluru"
+                >
+                  <div className="text-2xl">🌆</div>
+                  <div className="text-xs text-yellow-200 font-semibold">BLR</div>
+                </motion.button>
+              </>
+            )}
           </motion.div>
         </div>
         
@@ -218,13 +497,14 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
         </div>
       </motion.div>
 
-      {/* Game Map Container */}
-      <div className="relative flex-1 w-full p-4 pb-24">
-        <svg 
-          className="absolute inset-0 w-full h-full drop-shadow-lg" 
-          viewBox="0 0 800 500"
-          preserveAspectRatio="xMidYMid meet"
-        >
+             {/* Game Map Container */}
+             <div className="relative flex-1 w-full p-4 pb-24 overflow-visible">
+        <div className="relative w-full h-full min-h-96">
+          <svg 
+            className="absolute inset-0 w-full h-full drop-shadow-lg" 
+            viewBox="0 0 800 500"
+            preserveAspectRatio="xMidYMid meet"
+          >
           {/* Enhanced Railway track path */}
           <defs>
             <linearGradient id="trackGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -315,12 +595,27 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
         {/* Station Nodes */}
         {durontoExpressRoute.stations.map((station, index) => {
           const isCompleted = safeUserProgress.completedStations.includes(station.id);
-          const isCurrent = station.isUnlocked && !isCompleted;
+          const isUnlocked = station.isUnlocked || index === 0; // First station is always unlocked
+          
+          // Current station logic: unlocked but not completed, and either:
+          // 1. First station, OR
+          // 2. Previous station is completed (sequential), OR  
+          // 3. User is physically near this station
+          const isPreviousCompleted = index === 0 || safeUserProgress.completedStations.includes(station.id - 1);
+          const isNearStation = nearestStation && nearestStation.id === station.id && 
+                               nearestStation.distanceFromUser <= nearestStation.proximityRadius;
+          
+          const isCurrent = isUnlocked && !isCompleted && (isPreviousCompleted || isNearStation);
+          
+          // Debug logging for first few renders
+          if (index < 3) {
+            console.log(`🔍 Station ${station.name}: unlocked=${isUnlocked}, completed=${isCompleted}, current=${isCurrent}, prevCompleted=${isPreviousCompleted}`);
+          }
           
           return (
             <StationNode
               key={station.id}
-              station={station}
+              station={{...station, isUnlocked}} // Pass computed unlock state
               index={index}
               isCompleted={isCompleted}
               isCurrent={isCurrent}
@@ -370,6 +665,7 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
             </motion.div>
           </motion.div>
         </motion.div>
+        </div>
       </div>
 
       {/* Quest Modal */}
@@ -440,6 +736,7 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
         <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full" />
       </motion.div>
     </div>
+    </>
   );
 };
 

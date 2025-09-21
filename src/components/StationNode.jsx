@@ -4,7 +4,27 @@ import { questTypes } from '../data/routes';
 
 const StationNode = ({ station, index, isCompleted, isCurrent, onClick }) => {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState('bottom');
   const questType = questTypes[station.questType];
+  
+  // Calculate smart tooltip position based on station location
+  const calculateTooltipPosition = () => {
+    const y = (station.position.y / 100) * 500;
+    const x = (station.position.x / 100) * 800;
+    
+    // If station is in bottom half, show tooltip above
+    if (y > 250) {
+      setTooltipPosition('top');
+    }
+    // If station is in top half, show tooltip below
+    else {
+      setTooltipPosition('bottom');
+    }
+    
+    // Additional logic for edge cases
+    if (y > 400) setTooltipPosition('top');
+    if (y < 100) setTooltipPosition('bottom');
+  };
   
   const getNodeStyle = () => {
     if (isCompleted) {
@@ -40,8 +60,13 @@ const StationNode = ({ station, index, isCompleted, isCurrent, onClick }) => {
         transition: { duration: 0.2 }
       }}
       whileTap={{ scale: station.isUnlocked ? 0.9 : 1 }}
-      onMouseEnter={() => station.isUnlocked && setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
+             onMouseEnter={() => {
+               if (station.isUnlocked) {
+                 calculateTooltipPosition();
+                 setShowTooltip(true);
+               }
+             }}
+             onMouseLeave={() => setShowTooltip(false)}
       onClick={onClick}
     >
       {/* Outer Glow Ring */}
@@ -94,18 +119,26 @@ const StationNode = ({ station, index, isCompleted, isCurrent, onClick }) => {
         />
       </motion.div>
 
-      {/* Enhanced Station Info Tooltip - Only show for unlocked stations */}
-      <AnimatePresence>
-        {station.isUnlocked && showTooltip && (
-          <motion.div
-          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 
-                     bg-gradient-to-br from-white via-blue-50 to-purple-50 rounded-2xl shadow-2xl p-4 min-w-56 z-20
-                     border border-white/50 backdrop-blur-md pointer-events-none"
-          initial={{ opacity: 0, y: -20, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.8 }}
-          transition={{ duration: 0.3, type: "spring" }}
-        >
+             {/* Enhanced Station Info Tooltip - Only show for unlocked stations */}
+             <AnimatePresence>
+               {station.isUnlocked && showTooltip && (
+                 <motion.div
+                   className={`absolute left-1/2 transform -translate-x-1/2 z-30
+                              bg-gradient-to-br from-white via-blue-50 to-purple-50 rounded-2xl shadow-2xl p-4 min-w-64 max-w-80
+                              border border-white/50 backdrop-blur-md pointer-events-none
+                              ${tooltipPosition === 'top' ? 'bottom-full mb-4' : 'top-full mt-4'}`}
+                   initial={{ opacity: 0, y: tooltipPosition === 'top' ? 20 : -20, scale: 0.8 }}
+                   animate={{ opacity: 1, y: 0, scale: 1 }}
+                   exit={{ opacity: 0, y: tooltipPosition === 'top' ? 20 : -20, scale: 0.8 }}
+                   transition={{ duration: 0.3, type: "spring" }}
+                 >
+                   {/* Tooltip Arrow */}
+                   <div className={`absolute left-1/2 transform -translate-x-1/2 w-0 h-0 
+                                   ${tooltipPosition === 'top' 
+                                     ? 'top-full border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white' 
+                                     : 'bottom-full border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-white'}`} 
+                   />
+                   
         {/* Station Header */}
         <div className="flex items-center gap-2 mb-3">
           <div className="text-2xl">{questType.icon}</div>

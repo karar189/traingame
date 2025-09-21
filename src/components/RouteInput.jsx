@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
-const RouteInput = ({ onRouteSelect }) => {
+const RouteInput = ({ onRouteSelect, user, onLogout }) => {
   const [formData, setFormData] = useState({
     source: '',
     destination: '',
@@ -124,6 +124,40 @@ const RouteInput = ({ onRouteSelect }) => {
           >
             Enter your train journey details
           </motion.p>
+          
+          {/* User Info */}
+          {user && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mt-4 p-3 bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl border border-green-200"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">
+                    {user.loginMethod === 'metamask' ? '🦊' : '✍️'}
+                  </span>
+                  <div className="text-left">
+                    <div className="text-sm font-bold text-green-800">
+                      Connected: {user.loginMethod === 'metamask' ? 'MetaMask' : 'Manual'}
+                    </div>
+                    <div className="text-xs text-green-600 font-mono">
+                      {user.walletAddress.slice(0, 6)}...{user.walletAddress.slice(-4)}
+                    </div>
+                  </div>
+                </div>
+                <motion.button
+                  onClick={onLogout}
+                  className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-full text-xs font-medium transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Logout
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Quick Select - Duronto Express */}

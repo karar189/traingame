@@ -1,0 +1,342 @@
+{
+  "wallets": [
+    {
+      "walletAddress": "0xdd1d232bce6c5a264ab3248293fb6d3fea20359c",
+      "loginMethod": "manual",
+      "timestamp": "2025-09-21T16:27:36.711Z",
+      "sessionId": 1758472056711,
+      "ipAddress": "127.0.0.1",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+      "lastActive": "2025-09-21T16:27:36.733Z"
+    },
+    {
+      "walletAddress": "0x6b6be6bc0b79916c450e80ee746a8b6d7200c5f7",
+      "loginMethod": "manual",
+      "timestamp": "2025-09-21T17:01:43.805Z",
+      "sessionId": 1758474103805,
+      "ipAddress": "127.0.0.1",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+      "lastActive": "2025-09-21T17:01:43.835Z"
+    },
+    {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "timestamp": "2025-09-21T17:58:35.424Z",
+      "sessionId": 1758477515424,
+      "ipAddress": "10.139.98.80",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6.2 Mobile/22G100 Safari/604.1",
+      "lastActive": "2025-09-21T17:58:35.302Z"
+    },
+    {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "metamask",
+      "timestamp": "2025-09-21T17:22:29.498Z",
+      "sessionId": 1758475349498,
+      "ipAddress": "127.0.0.1",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+      "lastActive": "2025-09-21T17:22:29.506Z"
+    }
+  ],
+  "sessions": {
+    "1758472056711": {
+      "walletAddress": "0xdd1d232bce6c5a264ab3248293fb6d3fea20359c",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T16:27:36.734Z",
+      "gameProgress": {
+        "completedStations": [],
+        "collectedCards": [],
+        "totalXP": 0,
+        "tokens": 0,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T16:27:36.747Z"
+      }
+    },
+    "1758474103805": {
+      "walletAddress": "0x6b6be6bc0b79916c450e80ee746a8b6d7200c5f7",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:01:43.835Z",
+      "gameProgress": {
+        "completedStations": [],
+        "collectedCards": [],
+        "totalXP": 0,
+        "tokens": 0,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:01:43.849Z"
+      }
+    },
+    "1758474424767": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:07:04.880Z",
+      "gameProgress": {
+        "completedStations": [],
+        "collectedCards": [],
+        "totalXP": 0,
+        "tokens": 0,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:07:04.987Z"
+      }
+    },
+    "1758474897989": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:14:57.999Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King",
+          "Bhopal Lake Master"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:15:11.688Z"
+      }
+    },
+    "1758474917954": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:15:17.961Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King",
+          "Bhopal Lake Master"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:22:11.610Z",
+        "version": "1.0"
+      }
+    },
+    "1758475349498": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "metamask",
+      "startTime": "2025-09-21T17:22:29.506Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:26:23.530Z",
+        "version": "1.0"
+      }
+    },
+    "1758475629115": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:27:09.157Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          4,
+          4
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King",
+          "Bhopal Lake Master",
+          "Bhopal Lake Master"
+        ],
+        "totalXP": 500,
+        "tokens": 50,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:30:48.518Z",
+        "version": "1.0"
+      }
+    },
+    "1758475846784": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:30:46.717Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:31:03.833Z"
+      }
+    },
+    "1758475861931": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:31:01.940Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          2,
+          1
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King",
+          "Hyderabad Heritage",
+          "Bengaluru Tech Hub"
+        ],
+        "totalXP": 500,
+        "tokens": 50,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:47:50.032Z",
+        "version": "1.0"
+      }
+    },
+    "1758477300876": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:55:00.886Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:55:05.111Z"
+      }
+    },
+    "1758477336933": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:55:36.942Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:55:39.152Z",
+        "version": "1.0"
+      }
+    },
+    "1758477352018": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:55:52.023Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:55:54.921Z"
+      }
+    },
+    "1758477410388": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:56:50.396Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          1,
+          2,
+          3,
+          4
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King",
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King",
+          "Bhopal Lake Master"
+        ],
+        "totalXP": 700,
+        "tokens": 70,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:59:26.893Z"
+      }
+    },
+    "1758477515424": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T17:58:35.302Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T17:59:04.212Z",
+        "version": "1.0"
+      }
+    }
+  },
+  "metadata": {
+    "created": "2025-09-21T15:46:28.777Z",
+    "totalUsers": 4
+  }
+}

@@ -18,13 +18,18 @@ export const durontoExpressRoute = {
       platform: "1",
       stopDuration: "Start",
       distanceFromSource: 0,
-      questType: "intro",
-      questTitle: "Welcome to TrainQuest!",
-      questDescription: "Begin your epic journey from the Garden City of India",
+      questType: "photo",
+      questTitle: "📸 Bengaluru Tech Hub Selfie",
+      questDescription: "Take a selfie at Yeshwantpur Railway Station or any iconic Bengaluru tech landmark (UB City, Cubbon Park, or Vidhana Soudha)",
+      questChallenge: "Share your #TrainQuest journey starting from the Silicon Valley of India! 🚂💻",
+      twitterTemplate: "🚂 Starting my #TrainQuest journey from Bengaluru - the Silicon Valley of India! 🇮🇳💻 From Yeshwantpur to New Delhi, let's collect some NFTs! 🎮 #BengaluruToDelhi #NFTQuest #TechCity",
+      hashtags: ["TrainQuest", "BengaluruToDelhi", "NFTQuest", "TechCity", "SiliconValleyIndia"],
       cardReward: "Bengaluru Tech Hub",
       isCompleted: false,
       isUnlocked: true,
-      position: { x: 20, y: 85 }
+      position: { x: 20, y: 85 },
+      coordinates: { lat: 13.0287, lng: 77.5641 }, // Yeshwantpur Railway Station
+      proximityRadius: 5000 // 5km radius
     },
     {
       id: 2,
@@ -37,13 +42,18 @@ export const durontoExpressRoute = {
       platform: "1",
       stopDuration: "5m",
       distanceFromSource: 612,
-      questType: "cultural",
-      questTitle: "City of Pearls Explorer",
-      questDescription: "Discover the rich heritage of the Nizams and Biryani capital",
+      questType: "photo",
+      questTitle: "📸 Hyderabad Heritage Hunt",
+      questDescription: "Snap a photo at Hyderabad Deccan Railway Station or famous landmarks like Charminar, Golconda Fort, or Hussain Sagar Lake",
+      questChallenge: "Showcase the City of Pearls and Nizams! Don't forget to try some biryani! 🍛👑",
+      twitterTemplate: "🏛️ Exploring Hyderabad - the City of Pearls! 💎 Just stopped at Deccan Railway Station on my #TrainQuest to Delhi! The heritage and biryani here are unmatched! 🍛 #HyderabadHeritage #CityOfPearls #NFTQuest",
+      hashtags: ["TrainQuest", "HyderabadHeritage", "CityOfPearls", "NFTQuest", "Biryani"],
       cardReward: "Hyderabad Heritage",
       isCompleted: false,
       isUnlocked: false,
-      position: { x: 30, y: 70 }
+      position: { x: 30, y: 70 },
+      coordinates: { lat: 17.3850, lng: 78.4867 }, // Hyderabad Deccan Railway Station
+      proximityRadius: 8000 // 8km radius
     },
     {
       id: 3,
@@ -56,13 +66,18 @@ export const durontoExpressRoute = {
       platform: "3",
       stopDuration: "5m",
       distanceFromSource: 1012,
-      questType: "trivia",
-      questTitle: "Orange City Challenge",
-      questDescription: "Test your knowledge about the geographical center of India",
+      questType: "photo",
+      questTitle: "📸 Orange City Explorer",
+      questDescription: "Capture Nagpur Junction or iconic spots like Deekshabhoomi, Sitabuldi Fort, or pose with famous Nagpur oranges! 🍊",
+      questChallenge: "Show off the geographical heart of India and its famous oranges! 🇮🇳🍊",
+      twitterTemplate: "🍊 At the Orange City - Nagpur! 🚂 Halfway through my #TrainQuest journey at Nagpur Junction! The geographical center of India has the sweetest oranges! 🇮🇳 #OrangeCity #NagpurJunction #NFTQuest #HeartOfIndia",
+      hashtags: ["TrainQuest", "OrangeCity", "NagpurJunction", "NFTQuest", "HeartOfIndia"],
       cardReward: "Nagpur Orange King",
       isCompleted: false,
       isUnlocked: false,
-      position: { x: 45, y: 55 }
+      position: { x: 45, y: 55 },
+      coordinates: { lat: 21.1458, lng: 79.0882 }, // Nagpur Junction Railway Station
+      proximityRadius: 10000 // 10km radius
     },
     {
       id: 4,
@@ -76,12 +91,17 @@ export const durontoExpressRoute = {
       stopDuration: "5m",
       distanceFromSource: 1456,
       questType: "photo",
-      questTitle: "City of Lakes Explorer",
-      questDescription: "Capture the beauty of the lakes and Madhya Pradesh culture",
+      questTitle: "📸 City of Lakes Adventure",
+      questDescription: "Photograph Bhopal Junction or scenic spots like Upper Lake, Lower Lake, Taj-ul-Masajid, or Van Vihar National Park",
+      questChallenge: "Share the beauty of Madhya Pradesh's lake city! 🏞️💧",
+      twitterTemplate: "🏞️ Beautiful Bhopal - the City of Lakes! 💧 Stopped at Bhopal Junction during my #TrainQuest adventure! The lakes and Madhya Pradesh culture are breathtaking! 🚂 #CityOfLakes #BhopalJunction #NFTQuest #MadhyaPradesh",
+      hashtags: ["TrainQuest", "CityOfLakes", "BhopalJunction", "NFTQuest", "MadhyaPradesh"],
       cardReward: "Bhopal Lake Master",
       isCompleted: false,
       isUnlocked: false,
-      position: { x: 55, y: 40 }
+      position: { x: 55, y: 40 },
+      coordinates: { lat: 23.2599, lng: 77.4126 }, // Bhopal Junction Railway Station
+      proximityRadius: 8000 // 8km radius
     },
     {
       id: 5,
@@ -94,13 +114,18 @@ export const durontoExpressRoute = {
       platform: "1",
       stopDuration: "5m",
       distanceFromSource: 1789,
-      questType: "cultural",
-      questTitle: "Rani Lakshmibai's Fort",
-      questDescription: "Explore the heroic tales of the warrior queen and Bundelkhand culture",
+      questType: "photo",
+      questTitle: "📸 Warrior Queen's Legacy",
+      questDescription: "Capture Jhansi Junction or historic landmarks like Jhansi Fort, Rani Mahal, or Ganesh Mandir - honoring Rani Lakshmibai's bravery! ⚔️👑",
+      questChallenge: "Honor the legendary Rani Lakshmibai and Bundelkhand's rich history! 🏰⚔️",
+      twitterTemplate: "⚔️ At historic Jhansi! 👑 Visiting the land of brave Rani Lakshmibai during my #TrainQuest journey! The warrior queen's legacy lives on in every corner of this city! 🏰 #JhansiJunction #RaniLakshmibai #NFTQuest #WarriorQueen",
+      hashtags: ["TrainQuest", "JhansiJunction", "RaniLakshmibai", "NFTQuest", "WarriorQueen"],
       cardReward: "Jhansi Warrior Queen",
       isCompleted: false,
       isUnlocked: false,
-      position: { x: 65, y: 30 }
+      position: { x: 65, y: 30 },
+      coordinates: { lat: 25.4484, lng: 78.5685 }, // Jhansi Junction Railway Station
+      proximityRadius: 8000 // 8km radius
     },
     {
       id: 6,
@@ -113,63 +138,28 @@ export const durontoExpressRoute = {
       platform: "16",
       stopDuration: "End",
       distanceFromSource: 2444,
-      questType: "completion",
-      questTitle: "Capital Conquest Complete!",
-      questDescription: "You've successfully completed the epic Duronto journey to India's capital!",
+      questType: "photo",
+      questTitle: "📸 Capital Conquest Victory!",
+      questDescription: "Final photo at New Delhi Railway Station or iconic landmarks like India Gate, Red Fort, Lotus Temple, or Qutub Minar! 🏛️🇮🇳",
+      questChallenge: "Celebrate completing your epic TrainQuest journey to India's capital! 🎉🚂",
+      twitterTemplate: "🎉 JOURNEY COMPLETE! 🚂 Just arrived at New Delhi Railway Station after an epic #TrainQuest adventure from Bengaluru! 🇮🇳 Collected NFTs, made memories, and explored incredible India! 🏛️ #NewDelhi #TrainQuestComplete #NFTMaster #IndiaGate",
+      hashtags: ["TrainQuest", "NewDelhi", "TrainQuestComplete", "NFTMaster", "IndiaGate"],
       cardReward: "Delhi Duronto Master",
       isCompleted: false,
       isUnlocked: false,
-      position: { x: 80, y: 15 }
+      position: { x: 80, y: 15 },
+      coordinates: { lat: 28.6448, lng: 77.2197 }, // New Delhi Railway Station
+      proximityRadius: 10000 // 10km radius
     }
   ]
 };
 
 // Quest types configuration
 export const questTypes = {
-  intro: {
-    icon: "🚂",
-    color: "bg-blue-500",
-    description: "Journey begins here!"
-  },
-  trivia: {
-    icon: "🧠",
-    color: "bg-purple-500",
-    description: "Test your knowledge"
-  },
   photo: {
     icon: "📸",
     color: "bg-green-500",
     description: "Capture the moment"
-  },
-  ar_scan: {
-    icon: "🔍",
-    color: "bg-orange-500",
-    description: "Find hidden treasures"
-  },
-  social: {
-    icon: "👥",
-    color: "bg-pink-500",
-    description: "Connect with others"
-  },
-  food_challenge: {
-    icon: "🍛",
-    color: "bg-red-500",
-    description: "Culinary adventure"
-  },
-  cultural: {
-    icon: "🎭",
-    color: "bg-indigo-500",
-    description: "Cultural exploration"
-  },
-  nature: {
-    icon: "🌿",
-    color: "bg-emerald-500",
-    description: "Nature discovery"
-  },
-  completion: {
-    icon: "🏆",
-    color: "bg-yellow-500",
-    description: "Journey complete!"
   }
 };
 
