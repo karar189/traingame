@@ -1,9 +1,34 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { collectibleCards } from '../data/routes';
+
+// Import NFT card images
+import bengaluruImg from '../assets/bangalore.jpg';
+import hyderabadImg from '../assets/hydrebad.jpg';
+import nagpurImg from '../assets/nagpur.jpg';
+import bhopalImg from '../assets/bhopal.jpg';
+import jhansiImg from '../assets/jhansi.jpg';
+import delhiImg from '../assets/delhi.jpg';
 
 const QuestModal = ({ station, onComplete, onClose }) => {
   const [questStep, setQuestStep] = useState('intro'); // intro, instructions, posted, completed
   const [isPosting, setIsPosting] = useState(false);
+
+  // Get card name from ID
+  const getCardName = (cardId) => {
+    const card = collectibleCards.find(c => c.id === cardId);
+    return card ? card.name : cardId;
+  };
+
+  // Map card IDs to images
+  const cardImages = {
+    'bengaluru-tech': bengaluruImg,
+    'hyderabad-heritage': hyderabadImg,
+    'nagpur-orange': nagpurImg,
+    'bhopal-lakes': bhopalImg,
+    'jhansi-warrior': jhansiImg,
+    'delhi-master': delhiImg,
+  };
 
   // Generate Twitter/X URL with pre-filled content
   const generateTwitterUrl = () => {
@@ -213,11 +238,10 @@ const QuestModal = ({ station, onComplete, onClose }) => {
           >
             <motion.div
               animate={{ 
-                rotate: [0, 360],
-                scale: [1, 1.3, 1]
+                scale: [1, 1.2, 1]
               }}
-              transition={{ duration: 1.5 }}
-              className="text-8xl mb-6"
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+              className="text-6xl mb-4"
             >
               🏆
             </motion.div>
@@ -227,9 +251,35 @@ const QuestModal = ({ station, onComplete, onClose }) => {
             <p className="text-gray-600 mb-4">
               Amazing work! You've earned your NFT card:
             </p>
-            <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4 rounded-xl font-bold text-xl mb-6">
-              🎴 {station.cardReward}
-            </div>
+            
+            {/* NFT Card Image */}
+            <motion.div 
+              className="mb-6"
+              initial={{ scale: 0, rotate: -10 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.5, duration: 0.8, type: "spring" }}
+            >
+              <div className="relative mx-auto w-48 h-48 rounded-2xl overflow-hidden shadow-2xl border-4 border-yellow-400">
+                {cardImages[station.cardReward] ? (
+                  <img 
+                    src={cardImages[station.cardReward]} 
+                    alt={getCardName(station.cardReward)}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                    <div className="text-6xl">🎴</div>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                  <div className="text-sm font-bold text-center drop-shadow-lg">
+                    {getCardName(station.cardReward)}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+            
             <div className="text-sm text-gray-500">
               +100 XP • +10 Tokens • +1 NFT Card
             </div>

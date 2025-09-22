@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { questTypes } from '../data/routes';
+import { questTypes, collectibleCards } from '../data/routes';
 
 const StationNode = ({ station, index, isCompleted, isCurrent, onClick }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState('bottom');
   const questType = questTypes[station.questType];
+  
+  // Get card name from ID
+  const getCardName = (cardId) => {
+    const card = collectibleCards.find(c => c.id === cardId);
+    return card ? card.name : cardId;
+  };
   
   // Calculate smart tooltip position based on station location
   const calculateTooltipPosition = () => {
@@ -28,12 +34,16 @@ const StationNode = ({ station, index, isCompleted, isCurrent, onClick }) => {
   
   const getNodeStyle = () => {
     if (isCompleted) {
+      // Green for completed quests
       return 'bg-gradient-to-br from-emerald-400 via-green-500 to-emerald-600 border-emerald-300 text-white shadow-2xl shadow-emerald-500/50';
     } else if (isCurrent) {
-      return 'bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500 border-yellow-200 text-white shadow-2xl shadow-yellow-500/50';
+      // Special blue/cyan for current station (where user is physically located)
+      return 'bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-600 border-cyan-300 text-white shadow-2xl shadow-blue-500/50';
     } else if (station.isUnlocked) {
-      return `bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 border-blue-300 text-white shadow-2xl shadow-purple-500/50`;
+      // Yellow/amber for accessible but not completed quests
+      return 'bg-gradient-to-br from-yellow-300 via-amber-400 to-orange-500 border-yellow-200 text-white shadow-2xl shadow-yellow-500/50';
     } else {
+      // Gray for locked stations (train hasn't reached them yet)
       return 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 border-gray-200 text-gray-600 shadow-lg';
     }
   };
@@ -202,7 +212,7 @@ const StationNode = ({ station, index, isCompleted, isCurrent, onClick }) => {
               <div>
                 <div className="text-xs text-purple-600 font-semibold">REWARD</div>
                 <div className="text-sm font-bold text-purple-800">
-                  {station.cardReward}
+                  {getCardName(station.cardReward)}
                 </div>
               </div>
             </div>

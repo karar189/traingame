@@ -148,12 +148,19 @@ const WalletLoginModal = ({ isOpen, onClose, onLogin }) => {
       const result = await response.json();
       console.log('Wallet saved:', result);
 
-      // Call the onLogin callback with user data
-      onLogin({
+      const userData = {
         walletAddress: address,
         loginMethod: method,
-        sessionId: result.sessionId
-      });
+        sessionId: result.sessionId,
+        timestamp: new Date().toISOString()
+      };
+
+      // Always save to localStorage for persistence across refreshes
+      localStorage.setItem('trainquest_user', JSON.stringify(userData));
+      console.log('💾 User data saved to localStorage:', userData);
+
+      // Call the onLogin callback with user data
+      onLogin(userData);
 
       // Close modal
       onClose();

@@ -2,9 +2,34 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { collectibleCards, snackNFTs } from '../data/routes';
 
-const CardCollection = ({ userCards = [], userSnacks = [], onNavigate }) => {
+// Import NFT card images
+import bengaluruImg from '../assets/bangalore.jpg';
+import hyderabadImg from '../assets/hydrebad.jpg';
+import nagpurImg from '../assets/nagpur.jpg';
+import bhopalImg from '../assets/bhopal.jpg';
+import jhansiImg from '../assets/jhansi.jpg';
+import delhiImg from '../assets/delhi.jpg';
+
+const CardCollection = ({ userCards = [], userSnacks = [], onNavigate, user = null, onProgressUpdate = null }) => {
   const [activeTab, setActiveTab] = useState('cards');
   const [selectedCard, setSelectedCard] = useState(null);
+  const [showTradeModal, setShowTradeModal] = useState(false);
+  const [tradeAddress, setTradeAddress] = useState('');
+  const [isTrading, setIsTrading] = useState(false);
+
+  // Debug logging for received cards
+  console.log('🎴 CardCollection: Received userCards:', userCards);
+  console.log('🍽️ CardCollection: Received userSnacks:', userSnacks);
+
+  // Map card IDs to images
+  const cardImages = {
+    'bengaluru-tech': bengaluruImg,
+    'hyderabad-heritage': hyderabadImg,
+    'nagpur-orange': nagpurImg,
+    'bhopal-lakes': bhopalImg,
+    'jhansi-warrior': jhansiImg,
+    'delhi-duronto': delhiImg,
+  };
 
   const getRarityColor = (rarity) => {
     switch (rarity) {
@@ -17,54 +42,172 @@ const CardCollection = ({ userCards = [], userSnacks = [], onNavigate }) => {
     }
   };
 
+  const handleShare = (card) => {
+    const shareText = `🎴 Check out my ${card.name} NFT card from TrainQuest! 🚂 Collected during my epic journey from Bengaluru to Delhi! #TrainQuest #NFT #TravelGaming`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `My ${card.name} NFT Card`,
+        text: shareText,
+        url: window.location.href
+      });
+    } else {
+      // Fallback to Twitter
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+      window.open(twitterUrl, '_blank');
+    }
+  };
+
+  const handleTrade = async (card) => {
+    setSelectedCard(card);
+    setShowTradeModal(true);
+  };
+
+  const executeTrade = async () => {
+    if (!tradeAddress || !selectedCard || !user) return;
+    
+    setIsTrading(true);
+    try {
+      // Call the backend trade API
+      const response = await fetch('http://localhost:3001/api/trade', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fromAddress: user.walletAddress,
+          toAddress: tradeAddress,
+          cardId: selectedCard.id,
+          fromSessionId: user.sessionId
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Trade failed');
+      }
+      
+      // Show success message
+      alert(`✅ Trade completed! ${selectedCard.name} has been sent to ${tradeAddress}`);
+      
+      // Update local state to reflect the trade
+      if (onProgressUpdate && result.senderCards) {
+        // Update the user's progress with the new card collection
+        onProgressUpdate(prevProgress => ({
+          ...prevProgress,
+          collectedCards: result.senderCards
+        }));
+      } else {
+        // Fallback: refresh the page if no update function provided
+        window.location.reload();
+      }
+      
+      setShowTradeModal(false);
+      setTradeAddress('');
+      setSelectedCard(null);
+      
+      console.log('Trade completed successfully:', result);
+      
+    } catch (error) {
+      console.error('Trade failed:', error);
+      alert(`❌ Trade failed: ${error.message}`);
+    } finally {
+      setIsTrading(false);
+    }
+  };
+
   const CardItem = ({ item, isOwned, type = 'card' }) => (
     <motion.div
       className={`
-        relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-300
-        ${isOwned ? getRarityColor(item.rarity) : 'border-gray-200 bg-gray-100 opacity-50'}
-        hover:shadow-lg hover:scale-105
+        relative rounded-xl border-2 cursor-pointer transition-all duration-300 overflow-hidden
+        ${isOwned ? getRarityColor(item.rarity) : 'border-gray-300 bg-gray-50'}
+        hover:shadow-xl hover:scale-105 group
       `}
-      whileHover={{ y: -5 }}
+      whileHover={{ y: -8 }}
       onClick={() => isOwned && setSelectedCard(item)}
     >
-      {/* Card Image Placeholder */}
-      <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg mb-3 flex items-center justify-center">
-        <div className="text-4xl">
-          {type === 'card' ? '🎴' : item.name.includes('Chai') ? '☕' : 
-           item.name.includes('Samosa') ? '🥟' : 
-           item.name.includes('Rasgulla') ? '🍡' : '🍽️'}
-        </div>
+      {/* Card Image */}
+      <div className="aspect-square relative overflow-hidden">
+        {type === 'card' && cardImages[item.id] ? (
+          <img 
+            src={cardImages[item.id]} 
+            alt={item.name}
+            className={`w-full h-full object-cover transition-all duration-300 ${
+              !isOwned ? 'filter blur-sm grayscale opacity-40' : 'group-hover:scale-110'
+            }`}
+          />
+        ) : (
+          <div className={`w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center ${
+            !isOwned ? 'filter blur-sm grayscale opacity-40' : ''
+          }`}>
+            <div className="text-6xl">
+              {type === 'card' ? '🎴' : item.name.includes('Chai') ? '☕' : 
+               item.name.includes('Samosa') ? '🥟' : 
+               item.name.includes('Rasgulla') ? '🍡' : '🍽️'}
+            </div>
+          </div>
+        )}
+        
+        {/* Rarity Glow Effect */}
+        {isOwned && (
+          <div className={`absolute inset-0 opacity-20 bg-gradient-to-t ${
+            item.rarity === 'common' ? 'from-gray-500' :
+            item.rarity === 'uncommon' ? 'from-green-500' :
+            item.rarity === 'rare' ? 'from-purple-500' :
+            item.rarity === 'epic' ? 'from-orange-500' :
+            'from-yellow-500'
+          }`} />
+        )}
       </div>
 
       {/* Card Info */}
-      <div className="text-center">
-        <h3 className="font-semibold text-sm mb-1 truncate">{item.name}</h3>
-        <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
-        
-        {/* Rarity Badge */}
-        <div className={`
-          inline-block px-2 py-1 rounded-full text-xs font-semibold
-          ${item.rarity === 'common' ? 'bg-gray-200 text-gray-700' :
-            item.rarity === 'uncommon' ? 'bg-green-200 text-green-700' :
-            item.rarity === 'rare' ? 'bg-purple-200 text-purple-700' :
-            item.rarity === 'epic' ? 'bg-orange-200 text-orange-700' :
-            'bg-yellow-200 text-yellow-700'}
-        `}>
-          {item.rarity}
+      <div className="p-4">
+        <div className="text-center">
+          <h3 className={`font-bold text-sm mb-1 truncate ${!isOwned ? 'text-gray-400' : 'text-gray-800'}`}>
+            {item.name}
+          </h3>
+          <p className={`text-xs mb-2 line-clamp-2 ${!isOwned ? 'text-gray-400' : 'text-gray-600'}`}>
+            {item.description}
+          </p>
+          
+          {/* Rarity Badge */}
+          <div className={`
+            inline-block px-3 py-1 rounded-full text-xs font-bold
+            ${!isOwned ? 'bg-gray-200 text-gray-500' :
+              item.rarity === 'common' ? 'bg-gray-200 text-gray-700' :
+              item.rarity === 'uncommon' ? 'bg-green-200 text-green-700' :
+              item.rarity === 'rare' ? 'bg-purple-200 text-purple-700' :
+              item.rarity === 'epic' ? 'bg-orange-200 text-orange-700' :
+              'bg-yellow-200 text-yellow-700'}
+          `}>
+            {item.rarity.toUpperCase()}
+          </div>
         </div>
       </div>
 
       {/* Owned Indicator */}
       {isOwned && (
-        <div className="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-          <span className="text-white text-xs">✓</span>
-        </div>
+        <motion.div 
+          className="absolute top-3 right-3 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <span className="text-white text-sm font-bold">✓</span>
+        </motion.div>
       )}
 
-      {/* Not Owned Overlay */}
+      {/* Not Owned Lock Overlay */}
       {!isOwned && (
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-30 rounded-lg flex items-center justify-center">
-          <div className="text-white text-2xl">🔒</div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <motion.div 
+            className="bg-black/60 backdrop-blur-sm rounded-full p-4"
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="text-white text-3xl">🔒</div>
+          </motion.div>
         </div>
       )}
     </motion.div>
@@ -121,7 +264,20 @@ const CardCollection = ({ userCards = [], userSnacks = [], onNavigate }) => {
             🎴 My Collection
           </motion.h1>
           
-          <div className="w-32"></div> {/* Spacer for centering */}
+          {/* Refresh Button */}
+          <motion.button
+            onClick={() => {
+              console.log('🔄 Manual refresh requested');
+              window.location.reload();
+            }}
+            className="flex items-center gap-2 text-white hover:text-yellow-100 bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-2 border border-white/30"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            title="Refresh collection to see latest cards"
+          >
+            <span className="text-xl">🔄</span>
+            <span className="font-semibold">Refresh</span>
+          </motion.button>
         </div>
       </div>
 
@@ -229,58 +385,180 @@ const CardCollection = ({ userCards = [], userSnacks = [], onNavigate }) => {
         </div>
       </div>
 
-      {/* Card Detail Modal */}
+      {/* Enhanced Card Detail Modal */}
       <AnimatePresence>
-        {selectedCard && (
+        {selectedCard && !showTradeModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             onClick={() => setSelectedCard(null)}
           >
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-white rounded-2xl p-6 max-w-sm w-full"
+              initial={{ scale: 0.8, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 50 }}
+              className="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-white/50"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-center">
-                <div className="text-6xl mb-4">
-                  {activeTab === 'cards' ? '🎴' : 
-                   selectedCard.name.includes('Chai') ? '☕' : 
-                   selectedCard.name.includes('Samosa') ? '🥟' : 
-                   selectedCard.name.includes('Rasgulla') ? '🍡' : '🍽️'}
+                {/* Card Image */}
+                <div className="aspect-square mb-4 rounded-2xl overflow-hidden shadow-lg">
+                  {activeTab === 'cards' && cardImages[selectedCard.id] ? (
+                    <img 
+                      src={cardImages[selectedCard.id]} 
+                      alt={selectedCard.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                      <div className="text-8xl">
+                        {activeTab === 'cards' ? '🎴' : 
+                         selectedCard.name.includes('Chai') ? '☕' : 
+                         selectedCard.name.includes('Samosa') ? '🥟' : 
+                         selectedCard.name.includes('Rasgulla') ? '🍡' : '🍽️'}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <h2 className="text-xl font-bold mb-2">{selectedCard.name}</h2>
-                <p className="text-gray-600 mb-4">{selectedCard.description}</p>
+
+                <h2 className="text-2xl font-bold mb-2 text-gray-800">{selectedCard.name}</h2>
+                <p className="text-gray-600 mb-4 leading-relaxed">{selectedCard.description}</p>
                 
                 {selectedCard.effect && (
-                  <div className="bg-blue-50 p-3 rounded-lg mb-4">
+                  <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-4">
                     <p className="text-sm text-blue-800">
-                      <strong>Effect:</strong> {selectedCard.effect}
+                      <strong>✨ Effect:</strong> {selectedCard.effect}
                     </p>
                   </div>
                 )}
 
                 <div className={`
-                  inline-block px-4 py-2 rounded-full font-semibold mb-4
+                  inline-block px-6 py-2 rounded-full font-bold mb-6 text-sm
                   ${selectedCard.rarity === 'common' ? 'bg-gray-200 text-gray-700' :
                     selectedCard.rarity === 'uncommon' ? 'bg-green-200 text-green-700' :
                     selectedCard.rarity === 'rare' ? 'bg-purple-200 text-purple-700' :
                     selectedCard.rarity === 'epic' ? 'bg-orange-200 text-orange-700' :
                     'bg-yellow-200 text-yellow-700'}
                 `}>
-                  {selectedCard.rarity.toUpperCase()}
+                  {selectedCard.rarity.toUpperCase()} RARITY
                 </div>
 
-                <button
+                {/* Action Buttons */}
+                <div className="flex gap-3 mb-4">
+                  <motion.button
+                    onClick={() => handleShare(selectedCard)}
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 rounded-xl font-bold transition-all shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    📤 Share
+                  </motion.button>
+                  <motion.button
+                    onClick={() => handleTrade(selectedCard)}
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white py-3 rounded-xl font-bold transition-all shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    🔄 Trade
+                  </motion.button>
+                </div>
+
+                <motion.button
                   onClick={() => setSelectedCard(null)}
-                  className="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg font-semibold transition-colors"
+                  className="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-xl font-semibold transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   Close
-                </button>
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Trade Modal */}
+      <AnimatePresence>
+        {showTradeModal && selectedCard && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={() => setShowTradeModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0, y: 50 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 50 }}
+              className="bg-gradient-to-br from-white to-orange-50 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-white/50"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center">
+                <div className="text-4xl mb-4">🔄</div>
+                <h2 className="text-2xl font-bold mb-2 text-gray-800">Trade NFT Card</h2>
+                <p className="text-gray-600 mb-6">
+                  Send <strong>{selectedCard.name}</strong> to another player
+                </p>
+
+                <div className="text-left mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Recipient Wallet Address
+                  </label>
+                  <input
+                    type="text"
+                    value={tradeAddress}
+                    onChange={(e) => setTradeAddress(e.target.value.toLowerCase())}
+                    placeholder="0x1234567890abcdef..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter the wallet address of the player you want to trade with. They must be registered in the game.
+                  </p>
+                  <div className="mt-2 p-2 bg-blue-50 rounded-lg">
+                    <p className="text-xs text-blue-700">
+                      💡 <strong>Test Address:</strong> Try trading with other registered players from the wallet data.
+                    </p>
+                  </div>
+                  {tradeAddress && !tradeAddress.match(/^0x[a-fA-F0-9]{40}$/) && (
+                    <p className="text-xs text-red-500 mt-1">
+                      ⚠️ Invalid wallet address format. Should be 42 characters starting with 0x.
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex gap-3">
+                  <motion.button
+                    onClick={() => setShowTradeModal(false)}
+                    className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-xl font-semibold transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Cancel
+                  </motion.button>
+                  <motion.button
+                    onClick={executeTrade}
+                    disabled={!tradeAddress || isTrading || !tradeAddress.match(/^0x[a-fA-F0-9]{40}$/)}
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-all shadow-lg"
+                    whileHover={!isTrading && tradeAddress && tradeAddress.match(/^0x[a-fA-F0-9]{40}$/) ? { scale: 1.02 } : {}}
+                    whileTap={!isTrading && tradeAddress && tradeAddress.match(/^0x[a-fA-F0-9]{40}$/) ? { scale: 0.98 } : {}}
+                  >
+                    {isTrading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                        />
+                        Trading...
+                      </div>
+                    ) : (
+                      'Execute Trade'
+                    )}
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
           </motion.div>

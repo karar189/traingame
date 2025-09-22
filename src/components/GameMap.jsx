@@ -72,28 +72,44 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
     console.log(`🎯 Completing quest for station ${stationId}`);
     
     // Mark current station as completed
+    const newQuestCompletions = {
+      ...safeUserProgress.questCompletions,
+      [reward]: true // Mark the specific quest as completed
+    };
+    
+    // Avoid duplicate cards
+    const currentCards = safeUserProgress.collectedCards || [];
+    const newCollectedCards = currentCards.includes(reward) 
+      ? currentCards 
+      : [...currentCards, reward];
+
     const newProgress = {
       ...safeUserProgress,
       completedStations: [...safeUserProgress.completedStations, stationId],
       totalXP: safeUserProgress.totalXP + 100,
-      collectedCards: [...safeUserProgress.collectedCards, reward],
-      tokens: safeUserProgress.tokens + 10
+      collectedCards: newCollectedCards,
+      tokens: safeUserProgress.tokens + 10,
+      questCompletions: newQuestCompletions
     };
     
+    console.log('🎴 Quest completed! Adding card to collection:', reward);
+    console.log('📊 Updated progress:', newProgress);
+    console.log('🎯 New collected cards:', newProgress.collectedCards);
+    
     onProgressUpdate(newProgress);
+    
+    // Show success notification
+    if (!currentCards.includes(reward)) {
+      setTimeout(() => {
+        alert(`🎉 Quest completed! You've earned the "${reward}" NFT card! Check your collection to see it.`);
+      }, 2500);
+    }
     
     // Mark current station as completed in route data
     const currentStation = durontoExpressRoute.stations.find(s => s.id === stationId);
     if (currentStation) {
       currentStation.isCompleted = true;
       console.log(`✅ Marked station ${currentStation.name} as completed`);
-    }
-    
-    // Unlock next station in sequence (quest-based unlocking)
-    const nextStation = durontoExpressRoute.stations.find(s => s.id === stationId + 1);
-    if (nextStation) {
-      nextStation.isUnlocked = true;
-      console.log(`🔓 Unlocked next station: ${nextStation.name}`);
     }
     
     setSelectedStation(null);
@@ -111,13 +127,13 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
       onProgressUpdate(savedProgress);
     }
     
-    // Reset all stations to initial state (only first station unlocked)
+    // Reset all stations to initial state (GPS-based unlocking)
     if (durontoExpressRoute.stations.length > 0) {
       durontoExpressRoute.stations.forEach((station, index) => {
-        station.isUnlocked = index === 0; // Only first station unlocked
+        station.isUnlocked = index === 0; // Only first station unlocked initially
         station.isCompleted = false; // No stations completed initially
       });
-      console.log('🔄 Reset station states - only first station unlocked');
+      console.log('🔄 Reset station states - GPS-based unlocking enabled');
     }
     
     // Get user's location using offline-capable method
@@ -153,6 +169,7 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
         
         setLocationMessage(sourceMessage);
         checkUserLocation(location.lat, location.lng);
+        console.log('📍 Real GPS location acquired:', location);
       })
       .catch((error) => {
         setLocationError(error.message);
@@ -215,20 +232,24 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
       }
     }
     
-    // Auto-unlock current active station ONLY if user is physically near it AND previous station is completed
+    // GPS-based station unlocking based on journey progress
+    if (journeyProgress.stationsToUnlock && journeyProgress.stationsToUnlock.length > 0) {
+      journeyProgress.stationsToUnlock.forEach(stationId => {
+        const station = durontoExpressRoute.stations.find(s => s.id === stationId);
+        if (station && !station.isUnlocked) {
+          station.isUnlocked = true;
+          console.log(`🔓 GPS-based unlock: ${station.name}`);
+        }
+      });
+    }
+
+    // Unlock current active station if user is near it
     if (journeyProgress.canUnlockCurrent && journeyProgress.currentActiveStation) {
       const stationToUnlock = durontoExpressRoute.stations.find(s => s.id === journeyProgress.currentActiveStation.id);
-      const previousStationCompleted = stationToUnlock.id === 1 || safeUserProgress.completedStations.includes(stationToUnlock.id - 1);
-      
-      if (stationToUnlock && !stationToUnlock.isUnlocked && previousStationCompleted) {
-        // Only unlock if user is actually near the station (not just based on journey progression)
-        const isNearStation = nearestStation && nearestStation.id === stationToUnlock.id && 
-                             nearestStation.distanceFromUser <= nearestStation.proximityRadius;
-        
-        if (isNearStation) {
-          stationToUnlock.isUnlocked = true;
-          setLocationMessage(`🎉 ${stationToUnlock.name} unlocked! Ready for your quest!`);
-        }
+      if (stationToUnlock && !stationToUnlock.isUnlocked) {
+        stationToUnlock.isUnlocked = true;
+        setLocationMessage(`🎉 ${stationToUnlock.name} unlocked! Ready for your quest!`);
+        console.log(`🔓 Proximity unlock: ${stationToUnlock.name}`);
       }
     }
   };
@@ -250,6 +271,43 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
       return () => clearInterval(interval);
     }
   }, [locationStatus, userLocation, safeUserProgress.completedStations]);
+
+  // Manual location refresh function
+  const refreshLocation = () => {
+    setLocationStatus('checking');
+    setLocationMessage('📍 Refreshing your location...');
+    
+    getOfflineLocation()
+      .then((location) => {
+        setUserLocation(location);
+        setLocationStatus('granted');
+        
+        let sourceMessage = '';
+        switch (location.source) {
+          case 'gps':
+            sourceMessage = '📍 GPS location refreshed';
+            break;
+          case 'cached':
+            sourceMessage = '📍 Using cached location (offline mode)';
+            break;
+          case 'ip':
+            sourceMessage = '📍 Using network-based location';
+            break;
+          default:
+            sourceMessage = '📍 Location refreshed';
+        }
+        
+        setLocationMessage(sourceMessage);
+        checkUserLocation(location.lat, location.lng);
+        console.log('📍 Location manually refreshed:', location);
+      })
+      .catch((error) => {
+        setLocationError(error.message);
+        setLocationStatus('error');
+        setLocationMessage('📍 Location refresh failed. Please try again.');
+        console.warn('Location refresh failed:', error);
+      });
+  };
 
   return (
     <>
@@ -417,6 +475,33 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
                 {locationStatus === 'checking' ? '🔄' : '📍'}
               </div>
               <div className="text-xs text-yellow-200 font-semibold">Location</div>
+            </motion.button>
+            
+            {/* GPS Refresh Button - Force location update */}
+            <motion.button
+              onClick={refreshLocation}
+              className="bg-blue-500/20 backdrop-blur-sm rounded-2xl px-4 py-2 text-center border border-blue-300/30 hover:bg-blue-500/30 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Force refresh GPS to calculate current route progress"
+            >
+              <div className="text-2xl">🔄</div>
+              <div className="text-xs text-yellow-200 font-semibold">Refresh</div>
+            </motion.button>
+            
+            {/* Manual Sync Button - Force sync with server */}
+            <motion.button
+              onClick={() => {
+                console.log('🔄 Manual sync requested');
+                onProgressUpdate(safeUserProgress);
+              }}
+              className="bg-green-500/20 backdrop-blur-sm rounded-2xl px-4 py-2 text-center border border-green-300/30 hover:bg-green-500/30 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Force sync progress with server"
+            >
+              <div className="text-2xl">💾</div>
+              <div className="text-xs text-yellow-200 font-semibold">Sync</div>
             </motion.button>
             
             {/* Manual Location Override - Always show when location fails */}
@@ -594,22 +679,18 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
 
         {/* Station Nodes */}
         {durontoExpressRoute.stations.map((station, index) => {
-          const isCompleted = safeUserProgress.completedStations.includes(station.id);
-          const isUnlocked = station.isUnlocked || index === 0; // First station is always unlocked
+          // Check if quest is completed using questCompletions
+          const isCompleted = safeUserProgress.questCompletions && safeUserProgress.questCompletions[station.cardReward];
+          const isUnlocked = station.isUnlocked; // GPS-based unlocking
           
-          // Current station logic: unlocked but not completed, and either:
-          // 1. First station, OR
-          // 2. Previous station is completed (sequential), OR  
-          // 3. User is physically near this station
-          const isPreviousCompleted = index === 0 || safeUserProgress.completedStations.includes(station.id - 1);
+          // Current station logic: unlocked but not completed, and user is near it
           const isNearStation = nearestStation && nearestStation.id === station.id && 
                                nearestStation.distanceFromUser <= nearestStation.proximityRadius;
-          
-          const isCurrent = isUnlocked && !isCompleted && (isPreviousCompleted || isNearStation);
+          const isCurrent = isUnlocked && !isCompleted && isNearStation;
           
           // Debug logging for first few renders
           if (index < 3) {
-            console.log(`🔍 Station ${station.name}: unlocked=${isUnlocked}, completed=${isCompleted}, current=${isCurrent}, prevCompleted=${isPreviousCompleted}`);
+            console.log(`🔍 Station ${station.name}: unlocked=${isUnlocked}, completed=${isCompleted}, near=${isNearStation}, current=${isCurrent}`);
           }
           
           return (
@@ -618,7 +699,7 @@ const GameMap = ({ selectedRoute, userProgress = {}, onProgressUpdate, onNavigat
               station={{...station, isUnlocked}} // Pass computed unlock state
               index={index}
               isCompleted={isCompleted}
-              isCurrent={isCurrent}
+              isCurrent={isCurrent} // Show current if user is near an unlocked, incomplete station
               onClick={() => handleStationClick(station)}
             />
           );

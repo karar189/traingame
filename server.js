@@ -52,12 +52,43 @@ const readData = async () => {
   }
 };
 
-// Write data to file
+// Write data to file with backup and error recovery
 const writeData = async (data) => {
   try {
-    await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2));
+    console.log('💾 Writing data to file...');
+    
+    // Create backup before writing
+    const backupFile = `${DATA_FILE}.backup`;
+    try {
+      const currentData = await fs.readFile(DATA_FILE, 'utf8');
+      await fs.writeFile(backupFile, currentData);
+      console.log('📄 Backup created successfully');
+    } catch (backupError) {
+      console.warn('⚠️ Could not create backup:', backupError.message);
+    }
+
+    // Write new data
+    const jsonString = JSON.stringify(data, null, 2);
+    await fs.writeFile(DATA_FILE, jsonString);
+    
+    console.log('✅ Data written to file successfully');
+    console.log(`📊 File size: ${jsonString.length} characters`);
+    console.log(`👥 Total sessions: ${Object.keys(data.sessions).length}`);
+    
   } catch (error) {
-    console.error('Error writing data file:', error);
+    console.error('❌ Error writing data file:', error);
+    
+    // Try to restore from backup
+    try {
+      const backupFile = `${DATA_FILE}.backup`;
+      const backupData = await fs.readFile(backupFile, 'utf8');
+      await fs.writeFile(DATA_FILE, backupData);
+      console.log('🔄 Restored from backup after write failure');
+    } catch (restoreError) {
+      console.error('💥 Critical: Could not restore from backup:', restoreError);
+    }
+    
+    throw error; // Re-throw to let caller handle
   }
 };
 
@@ -188,15 +219,30 @@ app.post('/api/progress', async (req, res) => {
   try {
     const { sessionId, gameProgress } = req.body;
 
+    console.log('🔄 Progress update request received:');
+    console.log('📊 Session ID:', sessionId);
+    console.log('🎮 Game Progress:', gameProgress);
+
     if (!sessionId) {
+      console.log('❌ Missing session ID');
       return res.status(400).json({ error: 'Session ID is required' });
     }
 
+    if (!gameProgress) {
+      console.log('❌ Missing game progress data');
+      return res.status(400).json({ error: 'Game progress is required' });
+    }
+
     const data = await readData();
+    console.log('📖 Data read from file successfully');
     
     if (!data.sessions[sessionId]) {
+      console.log('❌ Session not found:', sessionId);
+      console.log('🔍 Available sessions:', Object.keys(data.sessions));
       return res.status(404).json({ error: 'Session not found' });
     }
+
+    console.log('📋 Current progress for session:', data.sessions[sessionId].gameProgress);
 
     // Update game progress
     data.sessions[sessionId].gameProgress = {
@@ -205,7 +251,10 @@ app.post('/api/progress', async (req, res) => {
       lastUpdated: new Date().toISOString()
     };
 
+    console.log('📋 Updated progress:', data.sessions[sessionId].gameProgress);
+
     await writeData(data);
+    console.log('💾 Data written to file successfully');
 
     res.json({
       success: true,
@@ -214,9 +263,11 @@ app.post('/api/progress', async (req, res) => {
       gameProgress: data.sessions[sessionId].gameProgress
     });
 
+    console.log('✅ Progress update completed successfully');
+
   } catch (error) {
-    console.error('Error updating progress:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('❌ Error updating progress:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
@@ -224,12 +275,19 @@ app.post('/api/progress', async (req, res) => {
 app.get('/api/session/:sessionId', async (req, res) => {
   try {
     const { sessionId } = req.params;
+    console.log('📊 Session data requested for:', sessionId);
+    
     const data = await readData();
     
     const session = data.sessions[sessionId];
     if (!session) {
+      console.log('❌ Session not found:', sessionId);
+      console.log('🔍 Available sessions:', Object.keys(data.sessions));
       return res.status(404).json({ error: 'Session not found' });
     }
+
+    console.log('✅ Session data found for:', sessionId);
+    console.log('🎮 Game progress:', session.gameProgress);
 
     res.json({
       sessionId,
@@ -242,6 +300,102 @@ app.get('/api/session/:sessionId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching session:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Trade NFT card between wallets
+app.post('/api/trade', async (req, res) => {
+  try {
+    const { fromAddress, toAddress, cardId, fromSessionId } = req.body;
+    
+    // Validation
+    if (!fromAddress || !toAddress || !cardId || !fromSessionId) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: fromAddress, toAddress, cardId, fromSessionId' 
+      });
+    }
+    
+    if (fromAddress.toLowerCase() === toAddress.toLowerCase()) {
+      return res.status(400).json({ 
+        error: 'Cannot trade with yourself' 
+      });
+    }
+    
+    const data = await readData();
+    
+    // Find sender's session
+    const senderSession = data.sessions[fromSessionId];
+    if (!senderSession || senderSession.walletAddress.toLowerCase() !== fromAddress.toLowerCase()) {
+      return res.status(400).json({ 
+        error: 'Invalid sender session or wallet address mismatch' 
+      });
+    }
+    
+    // Check if sender has the card
+    if (!senderSession.gameProgress.collectedCards.includes(cardId)) {
+      return res.status(400).json({ 
+        error: 'You do not own this card' 
+      });
+    }
+    
+    // Find recipient's wallet and session
+    const recipientWallet = data.wallets.find(w => 
+      w.walletAddress.toLowerCase() === toAddress.toLowerCase()
+    );
+    
+    if (!recipientWallet) {
+      return res.status(400).json({ 
+        error: 'Recipient wallet address not found. They need to register first.' 
+      });
+    }
+    
+    // Find recipient's most recent session
+    const recipientSession = Object.values(data.sessions).find(s => 
+      s.walletAddress.toLowerCase() === toAddress.toLowerCase()
+    );
+    
+    if (!recipientSession) {
+      return res.status(400).json({ 
+        error: 'Recipient has no game progress. They need to play first.' 
+      });
+    }
+    
+    // Execute the trade
+    // Remove card from sender
+    const cardIndex = senderSession.gameProgress.collectedCards.indexOf(cardId);
+    senderSession.gameProgress.collectedCards.splice(cardIndex, 1);
+    
+    // Add card to recipient (avoid duplicates)
+    if (!recipientSession.gameProgress.collectedCards.includes(cardId)) {
+      recipientSession.gameProgress.collectedCards.push(cardId);
+    }
+    
+    // Update timestamps
+    const now = new Date().toISOString();
+    senderSession.gameProgress.lastUpdated = now;
+    recipientSession.gameProgress.lastUpdated = now;
+    
+    // Save the updated data
+    await writeData(data);
+    
+    console.log(`🔄 Trade executed: ${cardId} from ${fromAddress} to ${toAddress}`);
+    
+    res.json({
+      success: true,
+      message: 'Trade completed successfully!',
+      trade: {
+        cardId,
+        from: fromAddress,
+        to: toAddress,
+        timestamp: now
+      },
+      senderCards: senderSession.gameProgress.collectedCards,
+      recipientCards: recipientSession.gameProgress.collectedCards
+    });
+    
+  } catch (error) {
+    console.error('Error executing trade:', error);
+    res.status(500).json({ error: 'Internal server error during trade' });
   }
 });
 
@@ -274,6 +428,42 @@ app.get('/api/export', async (req, res) => {
 
   } catch (error) {
     console.error('Error exporting data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Verify data integrity endpoint
+app.get('/api/verify/:sessionId', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    console.log('🔍 Verifying data integrity for session:', sessionId);
+    
+    const data = await readData();
+    
+    if (!data.sessions[sessionId]) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    const session = data.sessions[sessionId];
+    const verification = {
+      sessionExists: true,
+      hasGameProgress: !!session.gameProgress,
+      collectedCardsCount: session.gameProgress?.collectedCards?.length || 0,
+      completedStationsCount: session.gameProgress?.completedStations?.length || 0,
+      lastUpdated: session.gameProgress?.lastUpdated || 'Never',
+      walletAddress: session.walletAddress
+    };
+
+    console.log('🔍 Verification result:', verification);
+
+    res.json({
+      success: true,
+      sessionId,
+      verification
+    });
+
+  } catch (error) {
+    console.error('Error verifying data:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

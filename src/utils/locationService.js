@@ -174,17 +174,24 @@ export const determineJourneyProgress = (userLat, userLng, completedStations = [
   const stationsToUnlock = [];
   const stationsToComplete = [];
   
-  // If user is past Bengaluru (closer to later stations), unlock previous stations
-  if (nearestStation.id > 1) {
-    // Auto-unlock and complete all previous stations
-    for (let i = 1; i < nearestStation.id; i++) {
-      const station = stations.find(s => s.id === i);
-      if (station && !completedStations.includes(i)) {
-        stationsToUnlock.push(i);
+  // Calculate route progress: unlock all stations up to and including the nearest station
+  // This handles cases where user has traveled past multiple stations
+  for (let i = 1; i <= nearestStation.id; i++) {
+    const station = stations.find(s => s.id === i);
+    if (station) {
+      // Always unlock stations up to current position
+      stationsToUnlock.push(i);
+      
+      // Auto-complete passed stations (not the current/nearest one)
+      if (i < nearestStation.id && !completedStations.includes(i)) {
         stationsToComplete.push(i);
       }
     }
   }
+  
+  console.log(`🚂 Route Progress: Nearest station is ${nearestStation.name} (ID: ${nearestStation.id})`);
+  console.log(`🔓 Unlocking stations 1-${nearestStation.id}:`, stationsToUnlock);
+  console.log(`✅ Auto-completing passed stations:`, stationsToComplete);
 
   // Current active station logic - prioritize actual location over journey progression
   let currentActiveStation = null;
@@ -225,11 +232,11 @@ const generateJourneyLocationMessage = (nearestStation, journeyProgress) => {
   }
 
   const distanceKm = (nearestStation.distanceFromUser / 1000).toFixed(1);
-  const { currentActiveStation, canUnlockCurrent, stationsToComplete, isOnTrack } = journeyProgress;
+  const { currentActiveStation, canUnlockCurrent, stationsToComplete, isOnTrack, stationsToUnlock } = journeyProgress;
   
-  // If user has progressed and stations need to be auto-completed
+  // If user has progressed significantly and stations need to be auto-completed
   if (stationsToComplete.length > 0) {
-    return `🚂 Journey progress detected! Auto-completing ${stationsToComplete.length} passed station(s). Current: ${nearestStation.name}`;
+    return `🚂 Journey progress detected! You've passed ${stationsToComplete.length} station(s). Unlocking stations 1-${nearestStation.id}. Current: ${nearestStation.name} (${distanceKm}km)`;
   }
   
   // If user is actually at a station
@@ -239,16 +246,16 @@ const generateJourneyLocationMessage = (nearestStation, journeyProgress) => {
   
   // If user is near a station but not close enough
   if (nearestStation.distanceFromUser <= nearestStation.proximityRadius * 2) {
-    return `🚂 Near ${nearestStation.name} (${distanceKm}km). Get closer to unlock quest!`;
+    return `🚂 Near ${nearestStation.name} (${distanceKm}km). Stations 1-${nearestStation.id} unlocked!`;
   }
   
   // If user is on track but not at the right station yet
   if (isOnTrack) {
-    return `🚂 On route! Nearest: ${nearestStation.name} (${distanceKm}km). Next quest: ${currentActiveStation?.name}`;
+    return `🚂 On route! Nearest: ${nearestStation.name} (${distanceKm}km). Stations 1-${nearestStation.id} unlocked!`;
   }
   
   // Default message
-  return `📍 Nearest station: ${nearestStation.name} (${distanceKm}km away). Next quest: ${currentActiveStation?.name}`;
+  return `📍 Nearest station: ${nearestStation.name} (${distanceKm}km away). Stations 1-${nearestStation.id} unlocked based on your journey progress!`;
 };
 
 /**

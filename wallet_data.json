@@ -12,29 +12,38 @@
     {
       "walletAddress": "0x6b6be6bc0b79916c450e80ee746a8b6d7200c5f7",
       "loginMethod": "manual",
-      "timestamp": "2025-09-21T17:01:43.805Z",
-      "sessionId": 1758474103805,
+      "timestamp": "2025-09-21T18:30:58.805Z",
+      "sessionId": 1758479458805,
       "ipAddress": "127.0.0.1",
       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-      "lastActive": "2025-09-21T17:01:43.835Z"
+      "lastActive": "2025-09-21T18:30:58.810Z"
     },
     {
       "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
       "loginMethod": "manual",
-      "timestamp": "2025-09-21T17:58:35.424Z",
-      "sessionId": 1758477515424,
+      "timestamp": "2025-09-21T18:30:46.423Z",
+      "sessionId": 1758479446423,
       "ipAddress": "10.139.98.80",
       "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6.2 Mobile/22G100 Safari/604.1",
-      "lastActive": "2025-09-21T17:58:35.302Z"
+      "lastActive": "2025-09-21T18:30:46.371Z"
     },
     {
       "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
-      "loginMethod": "metamask",
-      "timestamp": "2025-09-21T17:22:29.498Z",
-      "sessionId": 1758475349498,
+      "loginMethod": "manual",
+      "timestamp": "2025-09-21T19:07:29.330Z",
+      "sessionId": 1758481649330,
       "ipAddress": "127.0.0.1",
       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-      "lastActive": "2025-09-21T17:22:29.506Z"
+      "lastActive": "2025-09-21T19:07:29.338Z"
+    },
+    {
+      "walletAddress": "0xe20939542659a8b7351c5d10bffd6fb5d8b8728f",
+      "loginMethod": "manual",
+      "timestamp": "2025-09-21T19:36:13.947Z",
+      "sessionId": 1758483373947,
+      "ipAddress": "10.139.98.80",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6.2 Mobile/22G100 Safari/604.1",
+      "lastActive": "2025-09-21T19:36:13.906Z"
     }
   ],
   "sessions": {
@@ -48,6 +57,14 @@
         "totalXP": 0,
         "tokens": 0,
         "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": false,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
         "lastUpdated": "2025-09-21T16:27:36.747Z"
       }
     },
@@ -333,10 +350,569 @@
         "lastUpdated": "2025-09-21T17:59:04.212Z",
         "version": "1.0"
       }
+    },
+    "1758477964299": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:06:04.309Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T18:20:32.361Z",
+        "version": "1.0"
+      }
+    },
+    "1758479096470": {
+      "walletAddress": "0x6b6be6bc0b79916c450e80ee746a8b6d7200c5f7",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:24:56.481Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          1
+        ],
+        "collectedCards": [
+          "Bengaluru Tech Hub",
+          "Hyderabad Heritage",
+          "Nagpur Orange King",
+          "Bengaluru Tech Hub"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T18:25:35.262Z",
+        "version": "1.0"
+      }
+    },
+    "1758479149864": {
+      "walletAddress": "0x6b6be6bc0b79916c450e80ee746a8b6d7200c5f7",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:25:49.870Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          1,
+          2,
+          3,
+          4
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "bhopal-lakes"
+        ],
+        "totalXP": 800,
+        "tokens": 80,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T18:26:55.567Z",
+        "version": "1.0"
+      }
+    },
+    "1758479288146": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:28:08.031Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          1,
+          2
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "bengaluru-tech",
+          "hyderabad-heritage"
+        ],
+        "totalXP": 600,
+        "tokens": 60,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T18:29:15.497Z",
+        "version": "1.0"
+      }
+    },
+    "1758479388266": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:29:48.146Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T18:30:36.196Z",
+        "version": "1.0"
+      }
+    },
+    "1758479440621": {
+      "walletAddress": "0x6b6be6bc0b79916c450e80ee746a8b6d7200c5f7",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:30:40.627Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T18:30:43.248Z",
+        "version": "1.0"
+      }
+    },
+    "1758479446423": {
+      "walletAddress": "0x13981e0478e727415c2085435416de5e80e26771",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:30:46.371Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          1
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "bengaluru-tech"
+        ],
+        "totalXP": 500,
+        "tokens": 50,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T18:31:11.982Z",
+        "version": "1.0"
+      }
+    },
+    "1758479458805": {
+      "walletAddress": "0x6b6be6bc0b79916c450e80ee746a8b6d7200c5f7",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:30:58.810Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T18:31:16.605Z",
+        "version": "1.0"
+      }
+    },
+    "1758480174636": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:42:54.646Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "lastUpdated": "2025-09-21T18:46:39.977Z",
+        "version": "1.0"
+      }
+    },
+    "1758480409839": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:46:49.844Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "bhopal-lakes"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": true,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T18:47:25.110Z",
+        "version": "1.0"
+      }
+    },
+    "1758480602297": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:50:02.308Z",
+      "gameProgress": {
+        "completedStations": [],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "bhopal-lakes"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": true,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T18:55:11.933Z",
+        "version": "1.0"
+      }
+    },
+    "1758480971204": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:56:11.211Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": false,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T18:56:12.939Z",
+        "version": "1.0"
+      }
+    },
+    "1758481029058": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:57:09.070Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          3
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "nagpur-orange"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": true,
+          "bhopal-lakes": false,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T18:58:02.084Z",
+        "version": "1.0"
+      }
+    },
+    "1758481089678": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T18:58:09.685Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": false,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T19:04:50.785Z",
+        "version": "1.0"
+      }
+    },
+    "1758481498811": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T19:04:58.820Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": false,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T19:06:17.564Z",
+        "version": "1.0"
+      }
+    },
+    "1758481590945": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T19:06:30.958Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": false,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T19:07:22.203Z",
+        "version": "1.0"
+      }
+    },
+    "1758481649330": {
+      "walletAddress": "0xbe4ad726d673dcaac17248b0cb0b93c2fc225585",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T19:07:29.338Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange"
+        ],
+        "totalXP": 300,
+        "tokens": 30,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": false,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T19:33:45.487Z",
+        "version": "1.0"
+      }
+    },
+    "1758481657788": {
+      "walletAddress": "0xe20939542659a8b7351c5d10bffd6fb5d8b8728f",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T19:07:37.725Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "bhopal-lakes"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": true,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T19:32:54.720Z",
+        "version": "1.0"
+      }
+    },
+    "1758481914159": {
+      "walletAddress": "0xe20939542659a8b7351c5d10bffd6fb5d8b8728f",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T19:11:54.106Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "bhopal-lakes"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": true,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T19:35:07.835Z",
+        "version": "1.0"
+      }
+    },
+    "1758483373947": {
+      "walletAddress": "0xe20939542659a8b7351c5d10bffd6fb5d8b8728f",
+      "loginMethod": "manual",
+      "startTime": "2025-09-21T19:36:13.906Z",
+      "gameProgress": {
+        "completedStations": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "collectedCards": [
+          "bengaluru-tech",
+          "hyderabad-heritage",
+          "nagpur-orange",
+          "bhopal-lakes"
+        ],
+        "totalXP": 400,
+        "tokens": 40,
+        "collectedSnacks": [],
+        "questCompletions": {
+          "bengaluru-tech": false,
+          "hyderabad-heritage": false,
+          "nagpur-orange": false,
+          "bhopal-lakes": true,
+          "jhansi-warrior": false,
+          "delhi-master": false
+        },
+        "lastUpdated": "2025-09-21T19:59:16.541Z",
+        "version": "1.0"
+      }
     }
   },
   "metadata": {
     "created": "2025-09-21T15:46:28.777Z",
-    "totalUsers": 4
+    "totalUsers": 5
   }
 }
